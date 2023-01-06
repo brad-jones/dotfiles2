@@ -8,6 +8,11 @@ README.md
 deno.json
 import-map.json
 
+{{ if ne .osid "windows" }}
+AppData/
+Documents/
+{{ end }}
+
 {{ if ne .osid "linux-ubuntu" }}
 .hushlogin
 {{ end }}
