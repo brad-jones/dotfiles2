@@ -2,6 +2,8 @@
 
 .github/
 .vscode/
+lib/
+dprint.json
 README.md
 
 {{ if ne .osid "linux-ubuntu" }}
