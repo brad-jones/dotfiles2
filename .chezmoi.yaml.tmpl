@@ -21,7 +21,7 @@ interpreters:
     command: {{ .chezmoi.homeDir }}/.local/bin/deno{{ $exe }}
     args:
       - run
-      - --config={{ .chezmoi.sourceDir }}/deno.json
+      - --import-map={{ .chezmoi.sourceDir }}/import-map.json
       - -qA
 
 data:
