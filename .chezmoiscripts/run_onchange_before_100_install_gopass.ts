@@ -1,7 +1,6 @@
-console.log('Hello World');
-/*import { downloadAndExtract } from "/lib/download/mod.ts";
-import { EXE, GOARCH, GOOS, HOME } from "/lib/runtime/mod.ts";
 import * as path from "https://deno.land/std@0.171.0/path/mod.ts#^";
+import { downloadAndExtract } from "lib/download/mod.ts";
+import { EXE, GOARCH, GOOS, HOME } from "lib/runtime/mod.ts";
 
 const version = "1.14.11";
 const extension = GOOS === "windows" ? ".zip" : ".tar.gz";
@@ -21,4 +20,3 @@ await downloadAndExtract(
 if (GOOS !== "windows") {
   await Deno.chmod(path.join(HOME, ".local", "bin", "gopass"), 0o755);
 }
-*/
