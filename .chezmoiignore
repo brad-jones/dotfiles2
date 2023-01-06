@@ -3,3 +3,7 @@
 .github/
 .vscode/
 README.md
+
+{{ if ne .osid "linux-ubuntu" }}
+.hushlogin
+{{ end }}
