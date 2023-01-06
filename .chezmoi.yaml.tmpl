@@ -3,7 +3,7 @@
 {{- $osid := .chezmoi.os -}}
 {{- if hasKey .chezmoi.osRelease "id" -}}
 {{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
-{{- end -}}
+{{- end }}
 
 # no idea why this comment is needed but if I don't put it here
 # then the YAML gets corrupted by the above template code.
