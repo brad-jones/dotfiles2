@@ -5,6 +5,11 @@
 {{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
 {{- end }}
 
+{{- $exe := "" -}}
+{{- if eq .chezmoi.os "windows" -}}
+{{-   $exe := ".exe" -}}
+{{- end }}
+
 edit:
   command: code -w
 
@@ -13,10 +18,11 @@ git:
 
 interpreters:
   ts:
-    command: {{ .chezmoi.homeDir }}/.local/bin/deno
+    command: {{ .chezmoi.homeDir }}/.local/bin/deno{{ .exe }}
     args:
       - run
       - -qA
 
 data:
+  exe: {{ $exe | quote }}
   osid: {{ $osid | quote }}
