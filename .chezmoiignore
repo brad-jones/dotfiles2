@@ -1,0 +1,5 @@
+# see: <https://www.chezmoi.io/user-guide/manage-machine-to-machine-differences/#ignore-files-or-a-directory-on-different-machines>
+
+.github/
+.vscode/
+README.md

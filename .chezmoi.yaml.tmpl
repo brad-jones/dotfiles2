@@ -1,0 +1,16 @@
+# see: https://www.chezmoi.io/reference/special-files-and-directories/chezmoi-format-tmpl/
+
+edit:
+  command: code -w
+
+git:
+  autoPush: true
+
+interpreters:
+  ts:
+    command: deno
+    args:
+      - run
+      - -qA
+
+data:
