@@ -5,6 +5,8 @@
 lib/
 dprint.json
 README.md
+deno.json
+import-map.json
 
 {{ if ne .osid "linux-ubuntu" }}
 .hushlogin
