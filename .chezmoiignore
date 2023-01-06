@@ -4,6 +4,12 @@
 .vscode/
 README.md
 
+{{ if eq .chezmoi.os "linux" }}
+.chezmoiscripts/run_onchange_before_install_deno.ps1
+{{ else if eq .chezmoi.os "windows" }}
+.chezmoiscripts/run_onchange_before_install_deno.sh
+{{ end }}
+
 {{ if ne .osid "linux-ubuntu" }}
 .hushlogin
 {{ end }}
