@@ -1,4 +1,5 @@
 {{ if eq .chezmoi.os "windows" }}
+Import-Module Microsoft.PowerShell.Security
 Set-ExecutionPolicy RemoteSigned -scope CurrentUser
 iwr -useb get.scoop.sh | iex
 {{ end }}
