@@ -18,7 +18,7 @@ git:
 
 interpreters:
   ts:
-    command: {{ .chezmoi.homeDir }}/.local/bin/deno{{ .exe }}
+    command: {{ .chezmoi.homeDir }}/.local/bin/deno{{ $exe }}
     args:
       - run
       - -qA
