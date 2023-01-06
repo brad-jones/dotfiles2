@@ -2,7 +2,7 @@
 $ErrorActionPreference = 'Stop'
 
 $Version = 'v1.29.2';
-$BinDir = "${HOME}\.local\bin"
+$BinDir = "${env:USERPROFILE}\.local\bin"
 $DenoZip = "$BinDir\deno.zip"
 $DenoExe = "$BinDir\deno.exe"
 $Target = 'x86_64-pc-windows-msvc'

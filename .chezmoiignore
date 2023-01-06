@@ -7,6 +7,8 @@ dprint.json
 README.md
 deno.json
 import-map.json
+install.ps1
+install.sh
 
 {{ if ne .osid "windows" }}
 AppData/
