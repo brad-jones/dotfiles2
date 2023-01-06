@@ -1,4 +1,3 @@
 {{ if eq .chezmoi.os "windows" }}
-#!/usr/bin/env pwsh
-echo "Hello World from PowerShell - i chancged"
+{{ include "install_deno.ps1" }}
 {{ end }}

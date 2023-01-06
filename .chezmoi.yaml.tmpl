@@ -13,7 +13,7 @@ git:
 
 interpreters:
   ts:
-    command: deno
+    command: {{ .chezmoi.homeDir }}/.local/bin/deno
     args:
       - run
       - -qA
