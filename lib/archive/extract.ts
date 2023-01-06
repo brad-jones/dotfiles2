@@ -1,9 +1,14 @@
 import * as decompressors from "./decompressors.ts";
 
 export async function extractFromStream(
-  type: "gz" | "tarGz" | "zip" | typeof decompressors.tarGz,
+  type: "tarGz" | "zip" | typeof decompressors.tarGz,
   src: ReadableStream<Uint8Array>,
-  dst: string,
+  dst:
+    | string
+    | ((
+      filename: string,
+      stream: ReadableStream<Uint8Array>,
+    ) => Promise<void> | void),
   filter?: (filename: string) => boolean,
 ) {
   if (typeof type === "string") {
@@ -15,7 +20,12 @@ export async function extractFromStream(
 
 export async function extractFromFile(
   src: string,
-  dst: string,
+  dst:
+    | string
+    | ((
+      filename: string,
+      stream: ReadableStream<Uint8Array>,
+    ) => Promise<void> | void),
   filter?: (filename: string) => boolean,
 ) {
   await pathToDecompressor(src).decompress(src, dst, filter);
@@ -26,8 +36,6 @@ export function pathToDecompressor(path: string) {
     case path.endsWith(".tgz"):
     case path.endsWith(".tar.gz"):
       return decompressors.tarGz;
-    case path.endsWith(".gz"):
-      return decompressors.gz;
     case path.endsWith(".zip"):
       return decompressors.zip;
     default:

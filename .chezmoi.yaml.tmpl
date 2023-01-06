@@ -28,6 +28,7 @@ interpreters:
 
 scriptEnv:
   SCOOP: {{ .chezmoi.homeDir }}/.scoop
+  PSModulePath: C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
 
 data:
   exe: {{ $exe | quote }}

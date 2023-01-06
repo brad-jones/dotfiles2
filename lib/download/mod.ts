@@ -54,7 +54,12 @@ export async function downloadToFile(
 export async function downloadAndExtract(
   src: string,
   digest: [DigestAlgorithm, string],
-  dst: string,
+  dst:
+    | string
+    | ((
+      filename: string,
+      stream: ReadableStream<Uint8Array>,
+    ) => Promise<void> | void),
   filter?: (filename: string) => boolean,
 ) {
   const bar = new ProgressBar({ title: src });
