@@ -1,5 +1,10 @@
 # see: https://www.chezmoi.io/reference/special-files-and-directories/chezmoi-format-tmpl/
 
+{{- $osid := .chezmoi.os -}}
+{{- if hasKey .chezmoi.osRelease "id" -}}
+{{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
+{{- end -}}
+
 edit:
   command: code -w
 
@@ -12,11 +17,6 @@ interpreters:
     args:
       - run
       - -qA
-
-{{- $osid := .chezmoi.os -}}
-{{- if hasKey .chezmoi.osRelease "id" -}}
-{{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
-{{- end -}}
 
 data:
   osid: {{ $osid | quote }}
