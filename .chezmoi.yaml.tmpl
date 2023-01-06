@@ -10,6 +10,8 @@
 {{-   $exe = ".exe" -}}
 {{- end }}
 
+progress: true
+
 edit:
   command: code -w
 
@@ -23,6 +25,9 @@ interpreters:
       - run
       - --config={{ .chezmoi.sourceDir }}/deno.json
       - -qA
+
+scriptEnv:
+  SCOOP: {{ .chezmoi.homeDir }}/.scoop
 
 data:
   exe: {{ $exe | quote }}
