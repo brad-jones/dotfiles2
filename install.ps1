@@ -2,7 +2,9 @@
 $ErrorActionPreference = 'Stop'
 
 # Example one liner:
-# Set-ExecutionPolicy Bypass -scope CurrentUser; curl.exe https://denopkg.com/brad-jones/dotfiles2/install.ps1 | powershell -c - -- --help
+# Set-ExecutionPolicy Bypass -scope CurrentUser; curl.exe -L https://denopkg.com/brad-jones/dotfiles2/install.ps1 | powershell -c - -- --help
+# irm https://denopkg.com/brad-jones/dotfiles2/install.ps1 | iex
+# (irm -useb https://denopkg.com/brad-jones/dotfiles2/install.ps1) | powershell -c -
 
 $Version = '1.29.2';
 $BinDir = "${env:USERPROFILE}\.local\bin"
@@ -30,7 +32,8 @@ if (!$installed) {
 # Execute our entrypoint
 $scriptRoot = $PSScriptRoot
 if ($scriptRoot -eq "") {
-  $scriptRoot = "https://denopkg.com/brad-jones/dotfiles2"
+  $scriptRoot = "https://denopkg.com/brad-jones/dotfiles2@master"
 }
-& $Exe run -qA $scriptRoot/main.ts $args
+echo "scriptRoot: $scriptRoot";
+& $Exe run -qA "$scriptRoot/main.ts" $args
 Exit $LASTEXITCODE
