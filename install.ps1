@@ -29,12 +29,12 @@ if (!$installed) {
   Remove-Item $Archive
 }
 
-# If working locally we don;t want to run the code from the remote repo but our local one
+# If working locally we don't want to run the code from the remote repo but our local one
 $scriptRoot = "https://denopkg.com/brad-jones/dotfiles2@master"
 if (![string]::IsNullOrEmpty($PSScriptRoot)) {
   $scriptRoot = $PSScriptRoot
 }
 
 # Execute our entrypoint
-& $Exe run -A "$scriptRoot/main.ts" $args
+& $Exe run -rA "$scriptRoot/main.ts" $args
 Exit $LASTEXITCODE
