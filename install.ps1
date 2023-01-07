@@ -2,21 +2,35 @@
 $ErrorActionPreference = 'Stop'
 
 # Example one liner:
-# Set-ExecutionPolicy Bypass -scope CurrentUser; curl.exe https://raw.githubusercontent.com/brad-jones/dotfiles/master/install.ps1 | powershell -c - -- --help
+# Set-ExecutionPolicy Bypass -scope CurrentUser; curl.exe https://denopkg.com/brad-jones/dotfiles2/install.ps1 | powershell -c - -- --help
 
-$Version = '2.29.1';
+$Version = '1.29.2';
 $BinDir = "${env:USERPROFILE}\.local\bin"
-$TmpDir = "${env:TEMP}\chezmoiDownload-bradsDotFiles"
-$Archive = "$TmpDir\chezmoi.zip"
-$Exe = "$BinDir\chezmoi.exe"
-$DownloadUrl = "https://github.com/twpayne/chezmoi/releases/download/v${Version}/chezmoi_${Version}_windows_amd64.zip"
+$Archive = "$BinDir\deno.zip"
+$Exe = "$BinDir\deno.exe"
+$Target = 'x86_64-pc-windows-msvc'
+$DownloadUrl = "https://github.com/denoland/deno/releases/download/v${Version}/deno-${Target}.zip"
 
-if (!(Test-Path $BinDir)) { New-Item $BinDir -ItemType Directory | Out-Null }
-if (!(Test-Path "$TmpDir\extracted")) { New-Item "$TmpDir\extracted" -ItemType Directory | Out-Null }
-curl.exe -Lo $Archive $DownloadUrl
-tar.exe xf $Archive -C "$TmpDir\extracted"
-Remove-Item $Exe
-mv "$TmpDir\extracted\chezmoi.exe" $Exe
-Remove-Item -Recurse -Force $TmpDir
+# Install deno if it's not already installed
+$installed = $false
+try {
+  if ($(& $Exe --version) -like "deno $Version*") {
+    $installed = $true
+  }
+} catch {
+  # swallow the not found exception
+}
+if (!$installed) {
+  if (!(Test-Path $BinDir)) { New-Item $BinDir -ItemType Directory | Out-Null }
+  curl.exe -Lo $Archive $DownloadUrl
+  tar.exe xf $Archive -C $BinDir
+  Remove-Item $Archive
+}
 
-& $Exe $args
+# Execute our entrypoint
+$scriptRoot = $PSScriptRoot
+if ($scriptRoot -eq "") {
+  $scriptRoot = "https://denopkg.com/brad-jones/dotfiles2"
+}
+& $Exe run -qA $scriptRoot/main.ts $args
+Exit $LASTEXITCODE
