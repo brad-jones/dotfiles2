@@ -29,11 +29,12 @@ if (!$installed) {
   Remove-Item $Archive
 }
 
-# Execute our entrypoint
-$scriptRoot = $PSScriptRoot
-if ($scriptRoot -eq "") {
-  $scriptRoot = "https://denopkg.com/brad-jones/dotfiles2@master"
+# If working locally we don;t want to run the code from the remote repo but our local one
+$scriptRoot = "https://denopkg.com/brad-jones/dotfiles2@master"
+if (![string]::IsNullOrEmpty($PSScriptRoot)) {
+  $scriptRoot = $PSScriptRoot
 }
-echo "scriptRoot: $scriptRoot";
-& $Exe run -qA "$scriptRoot/main.ts" $args
+
+# Execute our entrypoint
+& $Exe run -A "$scriptRoot/main.ts" $args
 Exit $LASTEXITCODE
