@@ -21,12 +21,11 @@ if (__dirname.startsWith("file://")) {
     }
   }
 } else if (__dirname.startsWith("https://")) {
-  // https://denopkg.com/brad-jones/dotfiles2@master
-  // https://raw.githubusercontent.com/brad-jones/dotfiles2/master
-  console.log(`__dirname: ${__dirname}`);
+  const meta = parseHttpUrl(__dirname);
+  console.log(meta);
 
-  const r = await ky.get(
-    `https://api.github.com/repos/brad-jones/dotfiles2/git/trees/master?recursive=1`,
+  /*const r = await ky.get(
+    `https://api.github.com/repos/${meta.owner}/${meta.repo}/git/trees/${meta.ref}?recursive=1`,
   ).json() as TreeResponse;
 
   for (
@@ -36,13 +35,13 @@ if (__dirname.startsWith("file://")) {
     )
   ) {
     console.log(
-      `https://raw.githubusercontent.com/brad-jones/dotfiles2/master/${t.path}`,
+      `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`,
     );
     FILES[path.join(HOME, t.path.replace("home/", "").replace(".ts", ""))] =
       (await import(
-        `https://raw.githubusercontent.com/brad-jones/dotfiles2/master/${t.path}`
+        `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`
       ))["default"];
-  }
+  }*/
 }
 
 interface TreeResponse {
@@ -58,4 +57,35 @@ interface TreeEntry {
   "type": string;
   "sha": string;
   "url": string;
+}
+
+// https://denopkg.com/brad-jones/dotfiles2@master/home
+// https://raw.githubusercontent.com/brad-jones/dotfiles2/master/home
+function parseHttpUrl(url: string) {
+  if (url.includes("denopkg.com")) {
+    const parts = url.replace("https://denopkg.com/", "").split("/");
+    const owner = parts[0];
+    let repo = parts[1];
+    let ref = "master";
+    if (repo.includes("@")) {
+      const repoParts = repo.split("@");
+      repo = repoParts[0];
+      ref = repoParts[1];
+    }
+    const path = parts.slice(1).join("/");
+    return { owner, repo, ref, path };
+  }
+
+  if (url.includes("raw.githubusercontent.com")) {
+    const parts = url.replace("https://raw.githubusercontent.com/", "").split(
+      "/",
+    );
+    const owner = parts[0];
+    const repo = parts[1];
+    const ref = parts[2];
+    const path = parts.slice(2).join("/");
+    return { owner, repo, ref, path };
+  }
+
+  throw new Error("unsupported remote");
 }
