@@ -25,8 +25,7 @@ if (__dirname.startsWith("file://")) {
 
   const meta = parseHttpUrl(__dirname);
   console.log(`meta: ${JSON.stringify(meta)}`);
-  
-  
+
   const gitTree = await ky.get(
     `https://api.github.com/repos/${meta.owner}/${meta.repo}` +
       `/git/trees/${meta.ref}?recursive=1`,
@@ -35,11 +34,15 @@ if (__dirname.startsWith("file://")) {
   for (
     const t of gitTree.tree.filter((_) =>
       _.path.startsWith(meta.path) && _.path.endsWith(".ts") &&
-      _.path != `${meta}/mod.ts`
+      _.path != `${meta.path}/mod.ts`
     )
   ) {
-    const filepath = path.join(HOME, t.path.replace(`${meta.path}/`, "").replace(".ts", ""));
-    const moduleUrl = `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`;
+    const filepath = path.join(
+      HOME,
+      t.path.replace(`${meta.path}/`, "").replace(".ts", ""),
+    );
+    const moduleUrl =
+      `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`;
     console.log(`filepath: ${filepath}`);
     console.log(`moduleUrl: ${moduleUrl}`);
     FILES[filepath] = (await import(moduleUrl))["default"];
