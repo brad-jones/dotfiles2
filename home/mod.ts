@@ -22,26 +22,22 @@ if (__dirname.startsWith("file://")) {
   }
 } else if (__dirname.startsWith("https://")) {
   const meta = parseHttpUrl(__dirname);
-  console.log(meta);
 
-  /*const r = await ky.get(
-    `https://api.github.com/repos/${meta.owner}/${meta.repo}/git/trees/${meta.ref}?recursive=1`,
+  const gitTree = await ky.get(
+    `https://api.github.com/repos/${meta.owner}/${meta.repo}` +
+      `/git/trees/${meta.ref}?recursive=1`,
   ).json() as TreeResponse;
 
   for (
-    const t of r.tree.filter((_) =>
-      _.path.startsWith("home/") && _.path.endsWith(".ts") &&
-      _.path != "home/mod.ts"
+    const t of gitTree.tree.filter((_) =>
+      _.path.startsWith(meta.path) && _.path.endsWith(".ts") &&
+      _.path != `${meta}/mod.ts`
     )
   ) {
-    console.log(
-      `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`,
-    );
-    FILES[path.join(HOME, t.path.replace("home/", "").replace(".ts", ""))] =
-      (await import(
-        `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`
-      ))["default"];
-  }*/
+    const filepath = path.join(HOME, t.path.replace(`${meta.path}/`, "").replace(".ts", ""));
+    const moduleUrl = `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`;
+    FILES[filepath] = (await import(moduleUrl))["default"];
+  }
 }
 
 interface TreeResponse {
@@ -72,7 +68,7 @@ function parseHttpUrl(url: string) {
       repo = repoParts[0];
       ref = repoParts[1];
     }
-    const path = parts.slice(1).join("/");
+    const path = parts.slice(2).join("/");
     return { owner, repo, ref, path };
   }
 
@@ -83,7 +79,7 @@ function parseHttpUrl(url: string) {
     const owner = parts[0];
     const repo = parts[1];
     const ref = parts[2];
-    const path = parts.slice(2).join("/");
+    const path = parts.slice(3).join("/");
     return { owner, repo, ref, path };
   }
 
