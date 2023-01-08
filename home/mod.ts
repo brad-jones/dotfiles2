@@ -21,13 +21,18 @@ if (__dirname.startsWith("file://")) {
     }
   }
 } else if (__dirname.startsWith("https://")) {
+  // https://denopkg.com/brad-jones/dotfiles2@master
+  // https://raw.githubusercontent.com/brad-jones/dotfiles2/master
+  console.log(`__dirname: ${__dirname}`);
+
   const r = await ky.get(
     `https://api.github.com/repos/brad-jones/dotfiles2/git/trees/master?recursive=1`,
   ).json() as TreeResponse;
 
   for (
     const t of r.tree.filter((_) =>
-      _.path.startsWith("home/") && _.path.endsWith(".ts")
+      _.path.startsWith("home/") && _.path.endsWith(".ts") &&
+      _.path != "home/mod.ts"
     )
   ) {
     console.log(
