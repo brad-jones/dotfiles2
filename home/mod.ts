@@ -21,8 +21,12 @@ if (__dirname.startsWith("file://")) {
     }
   }
 } else if (__dirname.startsWith("https://")) {
-  const meta = parseHttpUrl(__dirname);
+  console.log(`__dirname: ${__dirname}`);
 
+  const meta = parseHttpUrl(__dirname);
+  console.log(`meta: ${JSON.stringify(meta)}`);
+  
+  
   const gitTree = await ky.get(
     `https://api.github.com/repos/${meta.owner}/${meta.repo}` +
       `/git/trees/${meta.ref}?recursive=1`,
@@ -36,6 +40,8 @@ if (__dirname.startsWith("file://")) {
   ) {
     const filepath = path.join(HOME, t.path.replace(`${meta.path}/`, "").replace(".ts", ""));
     const moduleUrl = `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`;
+    console.log(`filepath: ${filepath}`);
+    console.log(`moduleUrl: ${moduleUrl}`);
     FILES[filepath] = (await import(moduleUrl))["default"];
   }
 }
