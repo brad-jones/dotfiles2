@@ -30,6 +30,9 @@ if (__dirname.startsWith("file://")) {
       _.path.startsWith("home/") && _.path.endsWith(".ts")
     )
   ) {
+    console.log(
+      `https://raw.githubusercontent.com/brad-jones/dotfiles2/master/${t.path}`,
+    );
     FILES[path.join(HOME, t.path.replace("home/", "").replace(".ts", ""))] =
       (await import(
         `https://raw.githubusercontent.com/brad-jones/dotfiles2/master/${t.path}`
