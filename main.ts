@@ -4,6 +4,7 @@ import { FILES } from "./home/mod.ts";
 import * as cmds from "./lib/cmds/mod.ts";
 
 console.log("main.ts", FILES);
+console.log("main.ts", cmds);
 
 //const rootCmd = new Command().name("dotfiles");
 //rootCmd.action(() => rootCmd.showHelp());

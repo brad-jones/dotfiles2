@@ -3,3 +3,5 @@
 
 import { FILES } from "../../home/mod.ts";
 console.log("lib/cmds/mod.ts", FILES);
+
+export const foo = "bar";
