@@ -3,69 +3,73 @@ import * as path from "https://deno.land/std@0.171.0/path/mod.ts#^";
 import ky from "https://esm.sh/ky@0.33.1#^";
 import { HOME } from "../lib/runtime/mod.ts";
 
-export const FILES: Record<string, (data?: Record<string, string>) => string> =
-  {};
+/**
+ * All our managed dotfiles are need to export a
+ * single default export matching this interface.
+ */
+export type FileTemplate = (data?: Record<string, string>) => string;
 
+/**
+ * This will be dynamically populated on first import of this module.
+ * It's basically a map of filepath to template function.
+ */
+export const FILES: Record<string, FileTemplate> = {};
+
+// If we are running locally we can easily just walk the filesystem to populate our FILES map
 const __dirname = path.dirname(import.meta.url);
-
 if (__dirname.startsWith("file://")) {
   const dir = path.fromFileUrl(__dirname);
-  for await (const walkEntry of fs.walk(dir)) {
-    if (
-      walkEntry.isFile && walkEntry.name.endsWith(".ts") &&
-      walkEntry.name != "mod.ts"
-    ) {
-      FILES[
-        path.join(HOME, walkEntry.path.replace(dir, "")).replace(".ts", "")
-      ] = (await import(`file:///${walkEntry.path}`))["default"];
+  for await (const e of fs.walk(dir)) {
+    if (e.isFile && e.name.endsWith(".ts") && e.name != "mod.ts") {
+      const filepath = path.join(HOME, e.path.replace(dir, "")).replace(
+        ".ts",
+        "",
+      );
+      const moduleUrl = `file:///${e.path}`;
+      FILES[filepath] = (await import(moduleUrl))["default"];
     }
   }
-} else if (__dirname.startsWith("https://")) {
-  console.log(`__dirname: ${__dirname}`);
+}
 
+// Otherwise we make a github API call to get a list of files
+if (__dirname.startsWith("https://")) {
   const meta = parseHttpUrl(__dirname);
-  console.log(`meta: ${JSON.stringify(meta)}`);
 
-  const gitTree = await ky.get(
-    `https://api.github.com/repos/${meta.owner}/${meta.repo}` +
-      `/git/trees/${meta.ref}?recursive=1`,
-  ).json() as TreeResponse;
+  const apiCall = `https://api.github.com/repos/${meta.owner}/${meta.repo}` +
+    `/git/trees/${meta.ref}?recursive=1`;
 
-  for (
-    const t of gitTree.tree.filter((_) =>
-      _.path.startsWith(meta.path) && _.path.endsWith(".ts") &&
-      _.path != `${meta.path}/mod.ts`
-    )
-  ) {
+  interface TreeResponse {
+    sha: string;
+    url: string;
+    truncated: boolean;
+    tree: TreeEntry[];
+  }
+
+  interface TreeEntry {
+    "path": string;
+    "mode": string;
+    "type": string;
+    "sha": string;
+    "url": string;
+  }
+
+  const paths = (await ky.get(apiCall).json() as TreeResponse).tree
+    .map((_) => _.path)
+    .filter((_) => _.startsWith(meta.path))
+    .filter((_) => _.endsWith(".ts"))
+    .filter((_) => _ != `${meta.path}/mod.ts`);
+
+  for (const p of paths) {
     const filepath = path.join(
       HOME,
-      t.path.replace(`${meta.path}/`, "").replace(".ts", ""),
+      p.replace(`${meta.path}/`, "").replace(".ts", ""),
     );
     const moduleUrl =
-      `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${t.path}`;
-    console.log(`filepath: ${filepath}`);
-    console.log(`moduleUrl: ${moduleUrl}`);
+      `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${p}`;
     FILES[filepath] = (await import(moduleUrl))["default"];
   }
 }
 
-interface TreeResponse {
-  sha: string;
-  url: string;
-  truncated: boolean;
-  tree: TreeEntry[];
-}
-
-interface TreeEntry {
-  "path": string;
-  "mode": string;
-  "type": string;
-  "sha": string;
-  "url": string;
-}
-
-// https://denopkg.com/brad-jones/dotfiles2@master/home
-// https://raw.githubusercontent.com/brad-jones/dotfiles2/master/home
 function parseHttpUrl(url: string) {
   if (url.includes("denopkg.com")) {
     const parts = url.replace("https://denopkg.com/", "").split("/");
