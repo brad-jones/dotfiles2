@@ -1,8 +1,8 @@
 import * as fs from "https://deno.land/std@0.171.0/fs/mod.ts#^";
 import * as path from "https://deno.land/std@0.171.0/path/mod.ts#^";
 import { $, _ } from "https://deno.land/x/denoexec@v1.1.5/mod.ts#^";
-import { downloadAndExtract } from "lib/download/mod.ts";
-import { HOME, OS } from "lib/runtime/mod.ts";
+import { downloadAndExtract } from "../download/mod.ts";
+import { HOME, OS } from "../runtime/mod.ts";
 
 const version = "2.0.4";
 const url = `https://github.com/gerardog/gsudo/releases/download` +

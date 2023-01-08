@@ -1,2 +1,2 @@
-export * as bar from "./bar.ts";
-export * as foo from "./foo.ts";
+export * as install from "./install.ts";
+export * as update from "./update.ts";

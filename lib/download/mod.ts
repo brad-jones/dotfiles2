@@ -1,19 +1,11 @@
-import {
-  crypto,
-  DigestAlgorithm,
-  toHashString,
-} from "https://deno.land/std@0.171.0/crypto/mod.ts#^";
 import * as path from "https://deno.land/std@0.171.0/path/mod.ts#^";
 import * as streams from "https://deno.land/std@0.171.0/streams/mod.ts#^";
 import ProgressBar from "https://deno.land/x/progress@v1.3.6/mod.ts#^";
 import ky from "https://esm.sh/ky@0.33.1#^";
 import { extractFromStream, pathToDecompressor } from "../archive/mod.ts";
+import { Digest } from "../digest/mod.ts";
 
-export async function downloadToFile(
-  src: string,
-  digest: [DigestAlgorithm, string],
-  dst: string,
-) {
+export async function downloadToFile(src: string, d: Digest, dst: string) {
   // Fetch the file
   const bar = new ProgressBar({ title: src });
   const rsp = await ky.get(src, {
@@ -38,22 +30,14 @@ export async function downloadToFile(
   }
 
   // Check digest
-  const fR = await Deno.open(dst, { read: true });
-  try {
-    const actualDigest = toHashString(
-      await crypto.subtle.digest(digest[0], fR.readable),
-    );
-    if (actualDigest !== digest[1]) {
-      throw new Error("digest mismatch");
-    }
-  } finally {
-    fR.close();
+  if (!await d.verifyFile(dst)) {
+    throw new Error("digest mismatch");
   }
 }
 
 export async function downloadAndExtract(
   src: string,
-  digest: [DigestAlgorithm, string],
+  d: Digest,
   dst:
     | string
     | ((
@@ -72,13 +56,7 @@ export async function downloadAndExtract(
   if (!stream) throw new Error("no stream");
   const [s1, s2] = stream.tee();
 
-  const hasher = (async () => {
-    const actualDigest = toHashString(
-      await crypto.subtle.digest(digest[0], s1),
-    );
-    return actualDigest === digest[1];
-  })();
-
+  const hasher = d.verifyBuffer(s1);
   const extractor = extractFromStream(pathToDecompressor(src), s2, dst, filter);
 
   const [hasherResult] = await Promise.all([hasher, extractor]);

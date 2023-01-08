@@ -1,3 +1,6 @@
+import { OS } from "../lib/runtime/mod.ts";
+
+export default () => `
 [init]
 	defaultBranch = master
 
@@ -17,9 +20,6 @@
 [includeIf "gitdir:~/Projects/Xero/"]
 	path = ~/Projects/Xero/.gitconfig
 
-[includeIf "gitdir:~/.local/share/chezmoi"]
-	path = ~/Projects/Personal/.gitconfig
-
 [includeIf "gitdir:~/.password-store/"]
 	path = ~/Projects/Personal/.gitconfig
 
@@ -30,21 +30,26 @@
 	path = /mnt/C/Users/brad.jones/Projects/Xero/.gitconfig
 
 [credential]
-	{{ if eq .chezmoi.os "windows" -}}
-	helper = manager
-	{{ else -}}
-	helper = cache
-	{{ end }}
+	helper = ${OS === "windows" ? "manage" : "cache"}
+
+[credential "https://github.com"]
+	helper =
+	helper = !'C:\\Users\\brad.jones\\.scoop\\apps\\gh\\current\\bin\\gh.exe' auth git-credential
+
+[credential "https://gist.github.com"]
+	helper =
+	helper = !'C:\\Users\\brad.jones\\.scoop\\apps\\gh\\current\\bin\\gh.exe' auth git-credential
 
 [gpg]
-	{{ if eq .chezmoi.os "windows" -}}
-	program = C:\\Users\\brad.jones\\.scoop\\apps\\gpg\\current\\bin\\gpg.exe
-	{{ else -}}
-	program = /usr/bin/gpg
-	{{ end }}
+	program = ${
+  OS === "windows"
+    ? "C:\\Users\\brad.jones\\.scoop\\apps\\gpg\\current\\bin\\gpg.exe"
+    : "/usr/bin/gpg"
+}
 
 [commit]
 	gpgSign = true
 
 [tag]
 	forceSignAnnotated = true
+`;

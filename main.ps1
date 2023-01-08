@@ -2,9 +2,7 @@
 $ErrorActionPreference = 'Stop'
 
 # Example one liner:
-# Set-ExecutionPolicy Bypass -scope CurrentUser; curl.exe -L https://denopkg.com/brad-jones/dotfiles2/install.ps1 | powershell -c - -- --help
-# irm https://denopkg.com/brad-jones/dotfiles2/install.ps1 | iex
-# (irm -useb https://denopkg.com/brad-jones/dotfiles2/install.ps1) | powershell -c -
+# &powershell -NoProfile -ExecutionPolicy unrestricted -C "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://denopkg.com/brad-jones/dotfiles2/main.ps1'))) <additional args>"
 
 $Version = '1.29.2';
 $BinDir = "${env:USERPROFILE}\.local\bin"
@@ -36,5 +34,5 @@ if (![string]::IsNullOrEmpty($PSScriptRoot)) {
 }
 
 # Execute our entrypoint
-& $Exe run -rA "$scriptRoot/main.ts" $args
+& $Exe run -A "$scriptRoot/main.ts" $args
 Exit $LASTEXITCODE

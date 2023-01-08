@@ -21,4 +21,7 @@
   "files.associations": {
     "*.gitmessagetpl": "git-commit"
   },
+  "[properties]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
 }
