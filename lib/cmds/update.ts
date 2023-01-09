@@ -1,24 +1,29 @@
 import { Command } from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts#^";
+import { writeDotFiles } from "../../home/mod.ts";
+import * as git from "../git/mod.ts";
+import * as gopass from "../gopass/mod.ts";
+import * as gpg from "../gpg/mod.ts";
+import * as gsudo from "../gsudo/mod.ts";
+import { OS } from "../runtime/mod.ts";
+import * as scoop from "../scoop/mod.ts";
+import * as ssh from "../ssh/mod.ts";
+import * as wincred from "../wincred/mod.ts";
 
 export default new Command()
-  .description("Run this to perform subsequent updates of the dotfiles")
-  .action(() => {
-    console.log("foo called");
+  .description("Run this to update software & re-apply dotfiles.")
+  .action(async () => {
+    // Ensure all the software is up to date.
+    // NB: Apps that have a pinned version won't necessarily be updated
+    await gopass.installOrUpdate();
+    if (OS === "windows") {
+      await gsudo.installOrUpdate();
+      await wincred.installOrUpdate();
+      await scoop.installOrUpdate();
+    }
+    await git.installOrUpdate();
+    await gpg.installOrUpdate();
+    await ssh.installOrUpdate();
 
-    // Wait for network connectivity
-    // When run on logon sometimes the network stack isn't ready for us
-    /*
-    goerr.Check(retry.Do(func() error {
-				r, err := resty.New().R().Get("https://www.google.com")
-				if err != nil {
-					return err
-				}
-				if !r.IsSuccess() {
-					return goerr.New("not 200")
-				}
-				return nil
-			}, retry.OnRetry(func(n uint, err error) {
-				fmt.Printf("waiting for internet access (attempt: %v)...\n", n)
-			})), "timed out waiting for internet access")
-    */
+    // Re-apply our dotfiles
+    await writeDotFiles();
   });

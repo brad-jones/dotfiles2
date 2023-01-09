@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
-# Example one liner:
-# ???
-
 Version="1.29.2"
 BinDir="${HOME}\.local\bin"
 Archive="$BinDir\deno.zip"
@@ -21,7 +18,7 @@ chmod +x "$Exe"
 rm "$Archive"
 
 # If working locally we don't want to run the code from the remote repo but our local one
-scriptRoot="https://denopkg.com/brad-jones/dotfiles2@master"
+scriptRoot="https://raw.githubusercontent.com/brad-jones/dotfiles/master"
 #if (![string]::IsNullOrEmpty($PSScriptRoot)) {
 #  $scriptRoot = $PSScriptRoot
 #}

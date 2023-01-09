@@ -34,16 +34,16 @@ export default () => `
 
 [credential "https://github.com"]
 	helper =
-	helper = !'C:\\Users\\brad.jones\\.scoop\\apps\\gh\\current\\bin\\gh.exe' auth git-credential
+	helper = !'C:\\\\Users\\\\brad.jones\\\\.scoop\\\\apps\\\\gh\\\\current\\\\bin\\\\gh.exe' auth git-credential
 
 [credential "https://gist.github.com"]
 	helper =
-	helper = !'C:\\Users\\brad.jones\\.scoop\\apps\\gh\\current\\bin\\gh.exe' auth git-credential
+	helper = !'C:\\\\Users\\\\brad.jones\\\\.scoop\\\\apps\\\\gh\\\\current\\\\bin\\\\gh.exe' auth git-credential
 
 [gpg]
 	program = ${
   OS === "windows"
-    ? "C:\\Users\\brad.jones\\.scoop\\apps\\gpg\\current\\bin\\gpg.exe"
+    ? "C:\\\\Users\\\\brad.jones\\\\.scoop\\\\apps\\\\gpg\\\\current\\\\bin\\\\gpg.exe"
     : "/usr/bin/gpg"
 }
 

@@ -1,16 +1,15 @@
 import * as fs from "https://deno.land/std@0.171.0/fs/mod.ts#^";
 import * as path from "https://deno.land/std@0.171.0/path/mod.ts#^";
 import { $, _ } from "https://deno.land/x/denoexec@v1.1.5/mod.ts#^";
+import { CONFIG } from "../../config.ts";
+import { Digest } from "../digest/mod.ts";
 import { downloadAndExtract } from "../download/mod.ts";
 import { HOME, OS } from "../runtime/mod.ts";
 
-const version = "2.0.4";
-const url = `https://github.com/gerardog/gsudo/releases/download` +
-  `/v${version}/gsudo.v${version}.zip`;
-const digest =
-  "0596a670ae0d3f28ae3ce6b695d47db02096ff4b34fd89d4e6519a1d6df40078";
-
-export async function install() {
+export async function installOrUpdate(
+  version = CONFIG.gsudo.version,
+  d = Digest.parse(CONFIG.gsudo.digest),
+) {
   if (OS !== "windows") {
     console.log("gsudo | skipping install, not windows");
     return;
@@ -31,9 +30,12 @@ export async function install() {
 
   console.log("gsudo | installing");
 
+  const url = `https://github.com/gerardog/gsudo/releases/download` +
+    `/v${version}/gsudo.v${version}.zip`;
+
   await downloadAndExtract(
     url,
-    ["SHA-256", digest],
+    d,
     async (filename, stream) => {
       if (filename.startsWith("x64")) {
         const dstFilePath = path.join(

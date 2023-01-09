@@ -1,23 +1,31 @@
 import * as fs from "https://deno.land/std@0.171.0/fs/mod.ts#^";
 import * as path from "https://deno.land/std@0.171.0/path/mod.ts#^";
 import ky from "https://esm.sh/ky@0.33.1#^";
+import { parseHttpImportUrl } from "../lib/deno/mod.ts";
 import { HOME } from "../lib/runtime/mod.ts";
 
-/**
- * All our managed dotfiles are need to export a
- * single default export matching this interface.
- */
-export type FileTemplate = (data?: Record<string, string>) => string;
-
-/**
- * This will be dynamically populated on first import of this module.
- * It's basically a map of filepath to template function.
- */
-export const FILES: Record<string, FileTemplate> = {};
-
-// If we are running locally we can easily just walk the filesystem to populate our FILES map
 const __dirname = path.dirname(import.meta.url);
-if (__dirname.startsWith("file://")) {
+
+export type FileTemplate = () => string;
+
+export async function writeDotFiles() {
+  let dotFiles: Record<string, FileTemplate>;
+  if (__dirname.startsWith("file://")) {
+    dotFiles = await readFromLocalFS();
+  } else if (__dirname.startsWith("https://")) {
+    dotFiles = await readFromRemoteRepo();
+  } else {
+    throw new Error(`unrecognised - __dirname: ${__dirname}`);
+  }
+
+  for (const [filepath, template] of Object.entries(dotFiles)) {
+    await Deno.writeTextFile(filepath, template());
+    console.log(`home | written ${filepath}`);
+  }
+}
+
+async function readFromLocalFS(): Promise<Record<string, FileTemplate>> {
+  const df: Record<string, FileTemplate> = {};
   const dir = path.fromFileUrl(__dirname);
   for await (const e of fs.walk(dir)) {
     if (e.isFile && e.name.endsWith(".ts") && e.name != "mod.ts") {
@@ -26,15 +34,15 @@ if (__dirname.startsWith("file://")) {
         "",
       );
       const moduleUrl = `file:///${e.path}`;
-      FILES[filepath] = (await import(moduleUrl))["default"];
+      df[filepath] = (await import(moduleUrl))["default"];
     }
   }
+  return df;
 }
 
-// Otherwise we make a github API call to get a list of files
-if (__dirname.startsWith("https://")) {
-  const meta = parseHttpUrl(__dirname);
-
+async function readFromRemoteRepo(): Promise<Record<string, FileTemplate>> {
+  const df: Record<string, FileTemplate> = {};
+  const meta = parseHttpImportUrl(__dirname);
   const apiCall = `https://api.github.com/repos/${meta.owner}/${meta.repo}` +
     `/git/trees/${meta.ref}?recursive=1`;
 
@@ -66,35 +74,8 @@ if (__dirname.startsWith("https://")) {
     );
     const moduleUrl =
       `https://raw.githubusercontent.com/${meta.owner}/${meta.repo}/${meta.ref}/${p}`;
-    FILES[filepath] = (await import(moduleUrl))["default"];
-  }
-}
-
-function parseHttpUrl(url: string) {
-  if (url.includes("denopkg.com")) {
-    const parts = url.replace("https://denopkg.com/", "").split("/");
-    const owner = parts[0];
-    let repo = parts[1];
-    let ref = "master";
-    if (repo.includes("@")) {
-      const repoParts = repo.split("@");
-      repo = repoParts[0];
-      ref = repoParts[1];
-    }
-    const path = parts.slice(2).join("/");
-    return { owner, repo, ref, path };
+    df[filepath] = (await import(moduleUrl))["default"];
   }
 
-  if (url.includes("raw.githubusercontent.com")) {
-    const parts = url.replace("https://raw.githubusercontent.com/", "").split(
-      "/",
-    );
-    const owner = parts[0];
-    const repo = parts[1];
-    const ref = parts[2];
-    const path = parts.slice(3).join("/");
-    return { owner, repo, ref, path };
-  }
-
-  throw new Error("unsupported remote");
+  return df;
 }

@@ -1,3 +1,6 @@
-export default () => `
-{ "Microsoft.PowerShell:ExecutionPolicy": "Bypass" }
-`;
+export default () =>
+  JSON.stringify(
+    { "Microsoft.PowerShell:ExecutionPolicy": "Bypass" },
+    null,
+    "  ",
+  );

@@ -1,9 +1,6 @@
 #!/usr/bin/env pwsh
 $ErrorActionPreference = 'Stop'
 
-# Example one liner:
-# &powershell -NoProfile -ExecutionPolicy unrestricted -C "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://denopkg.com/brad-jones/dotfiles2/main.ps1'))) <additional args>"
-
 $Version = '1.29.2';
 $BinDir = "${env:USERPROFILE}\.local\bin"
 $Archive = "$BinDir\deno.zip"
@@ -29,7 +26,7 @@ if (!$installed) {
 
 # If working locally we don't want to run the code from the remote repo but our local one
 $opts = "-rA"
-$scriptRoot = "https://denopkg.com/brad-jones/dotfiles2@master"
+$scriptRoot = "https://raw.githubusercontent.com/brad-jones/dotfiles/master"
 if (![string]::IsNullOrEmpty($PSScriptRoot)) {
   $scriptRoot = $PSScriptRoot
   $opts = "-A"

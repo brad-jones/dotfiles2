@@ -1,7 +1,4 @@
-//export * as install from "./install.ts";
-//export * as update from "./update.ts";
-
-import { FILES } from "../../home/mod.ts";
-console.log("lib/cmds/mod.ts", FILES);
-
-export const foo = "bar";
+export * as install from "./install.ts";
+export * as onlogin from "./onlogin.ts";
+export * as selfUpdate from "./self-update.ts";
+export * as update from "./update.ts";
