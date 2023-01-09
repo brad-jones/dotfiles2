@@ -34,7 +34,7 @@ export async function startAgent() {
             "powershell.exe",
             "-C",
             `if ((Get-Process "pageant" -ea SilentlyContinue) -eq $Null) { ` +
-              `Start-Process -NoNewWindow pageant.exe; ` +
+            `Start-Process -NoNewWindow pageant.exe; ` +
             `}`,
           ],
         }).status()).success
@@ -49,15 +49,11 @@ export async function startAgent() {
 export async function addKey(keyName: string) {
   const keyPath = path.join(HOME, ".ssh", keyName);
   await gopass.fscopy(`keys/ssh/${keyName}`, path.join(HOME, ".ssh", keyName));
-  try {
-    await stdin(
-      `${await gopass.get(`keys/ssh/${keyName}.pass`)}\n`,
-      _`ssh_add_with_pass ${keyPath}`,
-    );
-    console.log(`ssh | added ${keyPath}`);
-  } finally {
-    await Deno.remove(keyPath);
-  }
+  await stdin(
+    `${await gopass.get(`keys/ssh/${keyName}.pass`)}\n`,
+    _`ssh_add_with_pass ${keyPath}`,
+  );
+  console.log(`ssh | added ${keyPath}`);
 
   if (OS === "windows") {
     const pagentKeyPath = path.join(HOME, ".ssh", `${keyName}.ppk`);
